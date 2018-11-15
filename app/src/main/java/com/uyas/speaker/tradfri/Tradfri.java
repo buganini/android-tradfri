@@ -106,7 +106,10 @@ public class Tradfri {
                     mListener.onRefresh();
                 }
             });
-            mGateways.add(gateway);
+            if(!mGateways.contains(gateway)){
+                gateway.init();
+                mGateways.add(gateway);
+            }
         }
     };
 

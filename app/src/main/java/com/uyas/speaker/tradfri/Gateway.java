@@ -57,13 +57,15 @@ public class Gateway {
 
     private final List<Device> mDevices = new LinkedList<>();
 
-    public Gateway(Context context, String name, String host, int port, Callback callback){
+    public Gateway(Context context, String name, String host, int port, Callback callback) {
         mContext = context;
         mName = name;
         mHost = host;
         mPort = port;
         mCallback = callback;
+    }
 
+    public void init(){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
         mUser = sp.getString(KEY_USER, null);
         mPSK = sp.getString(KEY_PSK, null);
@@ -73,6 +75,15 @@ public class Gateway {
             mReady = true;
             getEndpoints();
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Gateway){
+            Gateway g = (Gateway) obj;
+            return g.getName().equals(getName());
+        }
+        return super.equals(obj);
     }
 
     public String getKey(){
