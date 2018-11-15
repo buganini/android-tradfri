@@ -30,6 +30,7 @@ import java.util.List;
 public class TestActivity extends AppCompatActivity {
     private final static String TAG = "TestActivity";
 
+    private Button add;
     private TextView stt;
     private List<Device> mDevices;
 
@@ -40,7 +41,8 @@ public class TestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
 
-        findViewById(R.id.add).setOnClickListener(new View.OnClickListener() {
+        add = findViewById(R.id.add);
+        add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 new SetupGateway(TestActivity.this, mTradfri);
@@ -69,6 +71,7 @@ public class TestActivity extends AppCompatActivity {
         mTradfri = new Tradfri(getApplicationContext(), new Tradfri.Listener() {
             @Override
             public void onRefresh() {
+                add.setVisibility(mTradfri.getUnboundGateways().size() > 0 ? View.VISIBLE : View.GONE);
                 mDevices = mTradfri.getDevices();
                 mAdapter.notifyDataSetChanged();
             }
