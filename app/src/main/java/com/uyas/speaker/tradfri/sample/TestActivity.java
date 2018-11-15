@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -257,6 +258,7 @@ public class TestActivity extends AppCompatActivity {
         class ViewHolder {
             TextView path;
             Button toggle;
+            SeekBar brightness;
             Device device;
 
             ViewHolder(View view){
@@ -268,15 +270,41 @@ public class TestActivity extends AppCompatActivity {
                         device.toggle();
                     }
                 });
+                brightness = view.findViewById(R.id.brightness);
+                brightness.setMin(0);
+                brightness.setMax(255);
+                brightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        device.setBrightness(seekBar.getProgress());
+                    }
+                });
             }
 
             void bind(Device d){
                 device = d;
                 path.setText(d.getName());
+                if(!device.isReady()){
+                    toggle.setVisibility(View.GONE);
+                    brightness.setVisibility(View.GONE);
+                    return;
+                }
                 if(d.supportLightControl()){
                     toggle.setText(d.getState() ? "Off" : "On");
                 }
                 toggle.setVisibility(d.supportLightControl() ? View.VISIBLE : View.GONE);
+                brightness.setVisibility(d.supportLightControl() ? View.VISIBLE : View.GONE);
+                brightness.setProgress(device.getBrightness());
             }
         }
 

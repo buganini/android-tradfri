@@ -23,6 +23,8 @@ public class Device {
     private String mName;
     private String mProductName;
     private Boolean mState;
+    private int mBrightness;
+    private boolean mReady = false;
     private boolean mSupportLightControl = false;
 
     public Device(Gateway gateway, String path){
@@ -71,7 +73,9 @@ public class Device {
                         JSONArray lca = data.getJSONArray(ATTR_LIGHT_CONTROL);
                         JSONObject lc = lca.getJSONObject(0);
                         mState = lc.getInt(ATTR_DEVICE_STATE) != 0;
+                        mBrightness = lc.getInt(ATTR_LIGHT_DIMMER);
                     }
+                    mReady = true;
                     mGateway.deviceListUpdated();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -85,8 +89,47 @@ public class Device {
         });
     }
 
+    public boolean isReady(){
+        return mReady;
+    }
+
     public Boolean getState(){
         return mState;
+    }
+
+    public int getBrightness(){
+        return mBrightness;
+    }
+
+    public void setBrightness(int brightness){
+        if(!supportLightControl()){
+            return;
+        }
+        if(mState == null){
+            return;
+        }
+        JSONObject data = new JSONObject();
+        JSONArray lca = new JSONArray();
+        JSONObject lc = new JSONObject();
+        try {
+            lc.put(ATTR_LIGHT_DIMMER, brightness);
+            lca.put(lc);
+            data.put(ATTR_LIGHT_CONTROL, lca);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+        getClient().put(new CoapHandler() {
+            @Override
+            public void onLoad(CoapResponse response) {
+                Log.e(TAG, "SetBrightness: "+response.getResponseText());
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
     }
 
     public void setName(String name){
