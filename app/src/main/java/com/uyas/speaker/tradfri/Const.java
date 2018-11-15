@@ -24,6 +24,8 @@ public class Const {
     public final static String ATTR_CURRENT_TIME_ISO8601 = "9060";
 
     public final static String ATTR_DEVICE_INFO = "3";
+    public final static String ATTR_DEVICE_VENDOR = "0";
+    public final static String ATTR_DEVICE_PRODUCT = "1";
 
     public final static String ATTR_GATEWAY_TIME_SOURCE = "9071";
     public final static String ATTR_GATEWAY_UPDATE_PROGRESS = "9055";

@@ -21,6 +21,7 @@ public class Device {
     private String mPath;
 
     private String mName;
+    private String mProductName;
     private Boolean mState;
     private boolean mSupportLightControl = false;
 
@@ -60,6 +61,10 @@ public class Device {
                 Log.e(TAG, mPath+"="+response.getResponseText());
                 try {
                     JSONObject data = new JSONObject(response.getResponseText());
+
+                    JSONObject device_info = data.getJSONObject(ATTR_DEVICE_INFO);
+                    mProductName = device_info.getString(ATTR_DEVICE_PRODUCT);
+
                     mName = data.getString(ATTR_NAME);
                     if(data.has(ATTR_LIGHT_CONTROL)){
                         mSupportLightControl = true;
@@ -82,6 +87,30 @@ public class Device {
 
     public Boolean getState(){
         return mState;
+    }
+
+    public void setName(String name){
+        if(name==null || name.isEmpty()){
+            name = mProductName;
+        }
+        JSONObject data = new JSONObject();
+        try {
+            data.put(ATTR_NAME, name);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+        getClient().put(new CoapHandler() {
+            @Override
+            public void onLoad(CoapResponse response) {
+                Log.e(TAG, "SetName: "+response.getResponseText());
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
     }
 
     public void toggle(){

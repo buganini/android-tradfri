@@ -2,9 +2,11 @@ package com.uyas.speaker.tradfri.sample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -38,6 +40,13 @@ public class TestActivity extends AppCompatActivity {
 
         devices = findViewById(R.id.devices);
         devices.setAdapter(mAdapter);
+        devices.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                new SetupDevice(TestActivity.this, mDevices.get(i));
+                return true;
+            }
+        });
 
         mTradfri = new Tradfri(getApplicationContext(), new Tradfri.Listener() {
             @Override
