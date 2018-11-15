@@ -53,6 +53,7 @@ public class Gateway {
     String mCode;
     String mPSK;
     Callback mCallback;
+    boolean mReady = false;
 
     private final List<Device> mDevices = new LinkedList<>();
 
@@ -63,26 +64,29 @@ public class Gateway {
         mPort = port;
         mCallback = callback;
 
-        String code = PreferenceManager.getDefaultSharedPreferences(context).getString(getKey(), null);
-        setCode(code);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mUser = sp.getString(KEY_USER, null);
+        mPSK = sp.getString(KEY_PSK, null);
+        if(mUser != null && mPSK != null){
+            Log.e(TAG, "user="+mUser);
+            Log.e(TAG, "psk="+mPSK);
+            mReady = true;
+            getEndpoints();
+        }
     }
 
     public String getKey(){
         return "gw/"+mName;
     }
 
+    public boolean isReady(){
+        return mReady;
+    }
+
     public void setCode(String code){
         mCode = code;
 
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-        editor.putString(getKey(), mCode);
-        editor.apply();
-
         getPSK();
-    }
-
-    public boolean hasCode(){
-        return mCode != null;
     }
 
     public String getName(){
@@ -154,15 +158,6 @@ public class Gateway {
         if(mCode == null){
             return;
         }
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
-        mUser = sp.getString(KEY_USER, null);
-        mPSK = sp.getString(KEY_PSK, null);
-        if(mUser != null && mPSK != null){
-            Log.e(TAG, "user="+mUser);
-            Log.e(TAG, "psk="+mPSK);
-            getEndpoints();
-            return;
-        }
         try {
             mUser = String.valueOf(System.currentTimeMillis());
 
@@ -187,6 +182,7 @@ public class Gateway {
                         editor.putString(KEY_PSK, mPSK);
                         editor.apply();
 
+                        mReady = true;
                         getEndpoints();
                     } catch (JSONException e) {
                         e.printStackTrace();

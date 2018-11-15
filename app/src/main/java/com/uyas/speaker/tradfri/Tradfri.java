@@ -121,7 +121,7 @@ public class Tradfri {
     public List<Gateway> getUnboundGateways(){
         List<Gateway> gateways = new LinkedList<>();
         for(Gateway gw : mGateways){
-            if(!gw.hasCode()){
+            if(!gw.isReady()){
                 gateways.add(gw);
             }
         }
