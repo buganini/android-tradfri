@@ -117,15 +117,25 @@ public class Device {
         if(mState == null){
             return;
         }
+        if(mState) {
+            turnOff();
+        } else {
+            turnOn();
+        }
+    }
+
+    public void turnOn(){
+        if(!supportLightControl()){
+            return;
+        }
+        if(mState == null){
+            return;
+        }
         JSONObject data = new JSONObject();
         JSONArray lca = new JSONArray();
         JSONObject lc = new JSONObject();
         try {
-            if(mState){
-                lc.put(ATTR_DEVICE_STATE, 0);
-            }else{
-                lc.put(ATTR_DEVICE_STATE, 1);
-            }
+            lc.put(ATTR_DEVICE_STATE, 1);
             lca.put(lc);
             data.put(ATTR_LIGHT_CONTROL, lca);
         } catch (JSONException e) {
@@ -135,7 +145,38 @@ public class Device {
         getClient().put(new CoapHandler() {
             @Override
             public void onLoad(CoapResponse response) {
-                Log.e(TAG, "Toggle: "+response.getResponseText());
+                Log.e(TAG, "TurnOn: "+response.getResponseText());
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
+    }
+
+    public void turnOff(){
+        if(!supportLightControl()){
+            return;
+        }
+        if(mState == null){
+            return;
+        }
+        JSONObject data = new JSONObject();
+        JSONArray lca = new JSONArray();
+        JSONObject lc = new JSONObject();
+        try {
+            lc.put(ATTR_DEVICE_STATE, 0);
+            lca.put(lc);
+            data.put(ATTR_LIGHT_CONTROL, lca);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+        getClient().put(new CoapHandler() {
+            @Override
+            public void onLoad(CoapResponse response) {
+                Log.e(TAG, "TurnOff: "+response.getResponseText());
             }
 
             @Override

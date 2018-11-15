@@ -113,6 +113,18 @@ public class Tradfri {
         }
     };
 
+    public Device getDeviceByName(String name){
+        for(Gateway gw : mGateways){
+            for(Device d: gw.getDevices()){
+                if(d.getName().equals(name)){
+                    return d;
+                }
+            }
+        }
+        return null;
+    }
+
+
     public List<Device> getDevices(){
         List<Device> devices = new LinkedList<>();
         for(Gateway gw : mGateways){
