@@ -29,8 +29,13 @@ public class Device {
         mPath = path;
     }
 
-    private String getUri(){
-        return String.format(Locale.ENGLISH, "coap://%s:%d%s", mGateway.getHost(), mGateway.getPort(), mPath);
+    private CoapClient mClient;
+    private CoapClient getClient(){
+        if(mClient==null){
+            mClient = new CoapClient(String.format(Locale.ENGLISH, "coap://%s:%d%s", mGateway.getHost(), mGateway.getPort(), mPath));
+            mClient.setEndpoint(mGateway.getDTLSEndpoint()).setTimeout(0).useCONs();
+        }
+        return mClient;
     }
 
     public String getName(){
@@ -49,9 +54,7 @@ public class Device {
     }
 
     public void observe(){
-        CoapClient client = new CoapClient(getUri());
-        client.setEndpoint(mGateway.getDTLSEndpoint()).setTimeout(0).useCONs();
-        client.observe(new CoapHandler() {
+        getClient().observe(new CoapHandler() {
             @Override
             public void onLoad(CoapResponse response) {
                 Log.e(TAG, mPath+"="+response.getResponseText());
@@ -100,9 +103,7 @@ public class Device {
             e.printStackTrace();
             return;
         }
-        CoapClient client = new CoapClient(getUri());
-        client.setEndpoint(mGateway.getDTLSEndpoint()).setTimeout(0).useCONs();
-        client.put(new CoapHandler() {
+        getClient().put(new CoapHandler() {
             @Override
             public void onLoad(CoapResponse response) {
                 Log.e(TAG, "Toggle: "+response.getResponseText());
