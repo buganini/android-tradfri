@@ -1,31 +1,49 @@
 package com.uyas.speaker.tradfri;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
+import android.os.Handler;
+import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
-public class Discovery {
-    private final static String TAG = "Discovery";
+import java.util.LinkedList;
+import java.util.List;
+
+public class Tradfri {
+    private final static String TAG = "Tradfri";
 
     public interface Listener {
-        void onFound(NsdServiceInfo serviceInfo);
-        void onFailed();
+        void onRefresh();
     }
 
     private final static String SERVICE_TYPE = "_coap._udp.";
 
+    Context mContext;
     NsdManager mNsdManager;
     Listener mListener;
+    Handler mHandler = new Handler(Looper.getMainLooper());
+    final List<Gateway> mGateways = new LinkedList<>();
+    SharedPreferences mSharedPreferences;
 
-    public Discovery(Context context, Listener listener){
+    public Tradfri(Context context, Listener listener){
+        mContext = context;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
         mListener = listener;
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
-    public void start(){
+    public void discovery(){
         mNsdManager.discoverServices(
                 SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mNsdManager.stopServiceDiscovery(mDiscoveryListener);
+            }
+        }, 5000);
     }
 
     NsdManager.DiscoveryListener mDiscoveryListener = new NsdManager.DiscoveryListener() {
@@ -61,7 +79,6 @@ public class Discovery {
         @Override
         public void onStartDiscoveryFailed(String serviceType, int errorCode) {
             Log.e(TAG, "Discovery failed: Error code:" + errorCode);
-            mListener.onFailed();
             mNsdManager.stopServiceDiscovery(this);
         }
 
@@ -75,15 +92,39 @@ public class Discovery {
     NsdManager.ResolveListener mResolveListener = new NsdManager.ResolveListener() {
         @Override
         public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-            mListener.onFailed();
             Log.e(TAG, "Resolve failed" + errorCode);
         }
         @Override
         public void onServiceResolved(NsdServiceInfo serviceInfo) {
             Log.e(TAG, "Resolve Succeeded. " + serviceInfo);
-            mListener.onFound(serviceInfo);
-
-            mNsdManager.stopServiceDiscovery(mDiscoveryListener);
+            String name = serviceInfo.getServiceName();
+            String host = serviceInfo.getHost().getHostAddress();
+            int port = serviceInfo.getPort();
+            Gateway gateway = new Gateway(mContext, name, host, port, new Gateway.Callback() {
+                @Override
+                public void onDevicesListUpdated() {
+                    mListener.onRefresh();
+                }
+            });
+            mGateways.add(gateway);
         }
     };
+
+    public List<Device> getDevices(){
+        List<Device> devices = new LinkedList<>();
+        for(Gateway gw : mGateways){
+            devices.addAll(gw.getDevices());
+        }
+        return devices;
+    }
+
+    public List<Gateway> getUnboundGateways(){
+        List<Gateway> gateways = new LinkedList<>();
+        for(Gateway gw : mGateways){
+            if(!gw.hasCode()){
+                gateways.add(gw);
+            }
+        }
+        return gateways;
+    }
 }

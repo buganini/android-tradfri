@@ -47,6 +47,7 @@ public class Gateway {
 
     String mUser;
     Context mContext;
+    String mName;
     String mHost;
     int mPort;
     String mCode;
@@ -55,26 +56,53 @@ public class Gateway {
 
     private final List<Device> mDevices = new LinkedList<>();
 
-    public Gateway(Context context, String host, int port, String code, Callback callback){
+    public Gateway(Context context, String name, String host, int port, Callback callback){
         mContext = context;
+        mName = name;
         mHost = host;
         mPort = port;
-        mCode = code;
         mCallback = callback;
+
+        String code = PreferenceManager.getDefaultSharedPreferences(context).getString(getKey(), null);
+        setCode(code);
+    }
+
+    public String getKey(){
+        return "gw/"+mName;
+    }
+
+    public void setCode(String code){
+        mCode = code;
+
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        editor.putString(getKey(), mCode);
+        editor.apply();
 
         getPSK();
     }
 
-    String getHost(){
+    public boolean hasCode(){
+        return mCode != null;
+    }
+
+    public String getName(){
+        return mName;
+    }
+
+    public String getHost(){
         return mHost;
     }
 
-    int getPort(){
+    public int getPort(){
         return mPort;
     }
 
+    CoapEndpoint mDTLSEndpoint;
     CoapEndpoint getDTLSEndpoint(){
-        return getDTLSEndpoint(mUser, mPSK);
+        if(mDTLSEndpoint == null){
+            mDTLSEndpoint = getDTLSEndpoint(mUser, mPSK);
+        }
+        return mDTLSEndpoint;
     }
 
     private CoapEndpoint getDTLSEndpoint(String user, String key){
@@ -123,6 +151,9 @@ public class Gateway {
     }
 
     private void getPSK(){
+        if(mCode == null){
+            return;
+        }
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
         mUser = sp.getString(KEY_USER, null);
         mPSK = sp.getString(KEY_PSK, null);
@@ -175,7 +206,7 @@ public class Gateway {
 
     private void getEndpoints(){
         CoapClient client = new CoapClient(String.format("coap://%s:%d/.well-known/core", mHost, mPort));
-        client.setEndpoint(getDTLSEndpoint(mUser, mPSK)).setTimeout(0).useCONs();
+        client.setEndpoint(getDTLSEndpoint()).setTimeout(0).useCONs();
         client.get(new CoapHandler() {
             @Override
             public void onLoad(CoapResponse response) {
@@ -211,7 +242,7 @@ public class Gateway {
         return mDevices;
     }
 
-    public void deviceListUpdated(){
+    void deviceListUpdated(){
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
             @Override

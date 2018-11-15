@@ -1,6 +1,5 @@
-package com.uyas.speaker.tradfri;
+package com.uyas.speaker.tradfri.sample;
 
-import android.net.nsd.NsdServiceInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,47 +10,40 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.uyas.speaker.tradfri.Device;
+import com.uyas.speaker.tradfri.R;
+import com.uyas.speaker.tradfri.Tradfri;
+
 import java.util.List;
 
 public class TestActivity extends AppCompatActivity {
     private final static String TAG = "TestActivity";
 
-    private final static String GATEWAY_CODE = "rld8JzckBgU530KB";
-
-    private TextView hostinfo;
     private ListView devices;
     private List<Device> mDevices;
 
-    private Discovery mDiscovery;
-    private Gateway mGateway;
+    private Tradfri mTradfri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
 
-        hostinfo = findViewById(R.id.hostinfo);
+        findViewById(R.id.add).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new SetupGateway(TestActivity.this, mTradfri);
+            }
+        });
+
         devices = findViewById(R.id.devices);
         devices.setAdapter(mAdapter);
 
-        mDiscovery = new Discovery(this, new Discovery.Listener() {
+        mTradfri = new Tradfri(getApplicationContext(), new Tradfri.Listener() {
             @Override
-            public void onFound(NsdServiceInfo serviceInfo) {
-                String host = serviceInfo.getHost().getHostAddress();
-                int port = serviceInfo.getPort();
-                hostinfo.setText(host+":"+port);
-                mGateway = new Gateway(TestActivity.this, host, port, GATEWAY_CODE, new Gateway.Callback() {
-                    @Override
-                    public void onDevicesListUpdated() {
-                        mDevices = mGateway.getDevices();
-                        mAdapter.notifyDataSetChanged();
-                    }
-                });
-            }
-
-            @Override
-            public void onFailed() {
-
+            public void onRefresh() {
+                mDevices = mTradfri.getDevices();
+                mAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -60,7 +52,7 @@ public class TestActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        mDiscovery.start();
+        mTradfri.discovery();
     }
 
     BaseAdapter mAdapter = new BaseAdapter() {
