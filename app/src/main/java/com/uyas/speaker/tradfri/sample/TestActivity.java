@@ -10,7 +10,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -260,8 +259,12 @@ public class TestActivity extends AppCompatActivity {
             Button toggle;
             SeekBar brightness;
             SeekBar spectrum;
+            SeekBar hue;
+            SeekBar saturation;
             View control_brightness;
             View control_spectrum;
+            View control_hue;
+            View control_saturation;
             Device device;
 
             ViewHolder(View view){
@@ -276,6 +279,8 @@ public class TestActivity extends AppCompatActivity {
 
                 control_brightness = view.findViewById(R.id.control_brightness);
                 control_spectrum = view.findViewById(R.id.control_spectrum);
+                control_hue = view.findViewById(R.id.control_hue);
+                control_saturation = view.findViewById(R.id.control_saturation);
 
                 brightness = view.findViewById(R.id.brightness);
                 brightness.setMin(Device.MIN_BRIGHTNESS);
@@ -316,6 +321,46 @@ public class TestActivity extends AppCompatActivity {
                         device.setSpectrum(seekBar.getProgress());
                     }
                 });
+
+                hue = view.findViewById(R.id.hue);
+                hue.setMin(Device.MIN_HUE);
+                hue.setMax(Device.MAX_HUE);
+                hue.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        device.setHue(seekBar.getProgress());
+                    }
+                });
+
+                saturation = view.findViewById(R.id.saturation);
+                saturation.setMin(Device.MIN_SATURATION);
+                saturation.setMax(Device.MAX_SATURATION);
+                saturation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        device.setSaturation(seekBar.getProgress());
+                    }
+                });
             }
 
             void bind(Device d){
@@ -325,6 +370,8 @@ public class TestActivity extends AppCompatActivity {
                     toggle.setVisibility(View.GONE);
                     control_brightness.setVisibility(View.GONE);
                     control_spectrum.setVisibility(View.GONE);
+                    control_hue.setVisibility(View.GONE);
+                    control_saturation.setVisibility(View.GONE);
                     return;
                 }
                 if(d.supportLightControl()){
@@ -335,6 +382,10 @@ public class TestActivity extends AppCompatActivity {
                 brightness.setProgress(device.getBrightness());
                 control_spectrum.setVisibility(d.supportSpectrum() ? View.VISIBLE : View.GONE);
                 spectrum.setProgress(device.getSpectrum());
+                control_hue.setVisibility(d.supportColor() ? View.VISIBLE : View.GONE);
+                hue.setProgress(device.getHue());
+                control_saturation.setVisibility(d.supportColor() ? View.VISIBLE : View.GONE);
+                saturation.setProgress(device.getSaturation());
             }
         }
 

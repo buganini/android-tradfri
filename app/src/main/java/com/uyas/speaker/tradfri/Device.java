@@ -17,23 +17,36 @@ import static com.uyas.speaker.tradfri.Const.*;
 public class Device {
     private final static String TAG = "Device";
 
-    public final static int MIN_BRIGHTNESS = 0;
-    public final static int MAX_BRIGHTNESS = 255;
+    // https://github.com/ggravlingen/pytradfri/issues/132
+
+    public final static int MIN_BRIGHTNESS = 1;
+    public final static int MAX_BRIGHTNESS = 254;
 
     public final static int MIN_SPECTRUM = 250;
     public final static int MAX_SPECTRUM = 454;
+
+    public final static int MIN_HUE = 0;
+    public final static int MAX_HUE = 65535;
+
+    public final static int MIN_SATURATION = 0;
+    public final static int MAX_SATURATION = 65279;
 
     private Gateway mGateway;
     private String mPath;
 
     private String mName;
     private String mProductName;
-    private Boolean mState;
-    private int mBrightness;
+
     private boolean mReady = false;
     private boolean mSupportLightControl = false;
     private boolean mSupportSpectrum = false;
+    private boolean mSupportColor = false;
+
+    private Boolean mState;
+    private int mBrightness;
     private int mSpectrum;
+    private int mHue;
+    private int mSaturation;
 
     public Device(Gateway gateway, String path){
         mGateway = gateway;
@@ -68,6 +81,10 @@ public class Device {
         return mSupportSpectrum;
     }
 
+    public boolean supportColor(){
+        return mSupportColor;
+    }
+
     public void observe(){
         getClient().observe(new CoapHandler() {
             @Override
@@ -89,6 +106,11 @@ public class Device {
                         if(lc.has(ATTR_LIGHT_MIREDS)){
                             mSupportSpectrum = true;
                             mSpectrum = lc.getInt(ATTR_LIGHT_MIREDS);
+                        }
+                        if(lc.has(ATTR_LIGHT_COLOR_HUE) && lc.has(ATTR_LIGHT_COLOR_SATURATION)){
+                            mSupportColor = true;
+                            mHue = lc.getInt(ATTR_LIGHT_COLOR_HUE);
+                            mSaturation = lc.getInt(ATTR_LIGHT_COLOR_SATURATION);
                         }
                     }
                     mReady = true;
@@ -155,7 +177,7 @@ public class Device {
     }
 
     public void setSpectrum(int spectrum){
-        if(!supportLightControl()){
+        if(!supportSpectrum()){
             return;
         }
         if(mState == null){
@@ -178,6 +200,82 @@ public class Device {
             @Override
             public void onLoad(CoapResponse response) {
                 Log.e(TAG, "setSpectrum: "+response.getResponseText());
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
+    }
+
+    public int getHue(){
+        return mHue;
+    }
+
+    public void setHue(int hue){
+        if(!supportColor()){
+            return;
+        }
+        if(mState == null){
+            return;
+        }
+        hue = Math.min(hue, MAX_HUE);
+        hue = Math.max(hue, MIN_HUE);
+        JSONObject data = new JSONObject();
+        JSONArray lca = new JSONArray();
+        JSONObject lc = new JSONObject();
+        try {
+            lc.put(ATTR_LIGHT_COLOR_HUE, hue);
+            lc.put(ATTR_LIGHT_COLOR_SATURATION, mSaturation);
+            lca.put(lc);
+            data.put(ATTR_LIGHT_CONTROL, lca);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+        getClient().put(new CoapHandler() {
+            @Override
+            public void onLoad(CoapResponse response) {
+                Log.e(TAG, "setHue: "+response.getResponseText());
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
+    }
+
+    public int getSaturation(){
+        return mSaturation;
+    }
+
+    public void setSaturation(int saturation){
+        if(!supportColor()){
+            return;
+        }
+        if(mState == null){
+            return;
+        }
+        saturation = Math.min(saturation, MAX_SATURATION);
+        saturation = Math.max(saturation, MIN_SATURATION);
+        JSONObject data = new JSONObject();
+        JSONArray lca = new JSONArray();
+        JSONObject lc = new JSONObject();
+        try {
+            lc.put(ATTR_LIGHT_COLOR_HUE, mHue);
+            lc.put(ATTR_LIGHT_COLOR_SATURATION, saturation);
+            lca.put(lc);
+            data.put(ATTR_LIGHT_CONTROL, lca);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+        getClient().put(new CoapHandler() {
+            @Override
+            public void onLoad(CoapResponse response) {
+                Log.e(TAG, "setSaturation: "+response.getResponseText());
             }
 
             @Override
