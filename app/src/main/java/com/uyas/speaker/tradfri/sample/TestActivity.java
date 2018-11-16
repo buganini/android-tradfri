@@ -127,9 +127,12 @@ public class TestActivity extends AppCompatActivity {
 
             @Override
             public void onResults(Bundle bundle) {
-                String text = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).get(0);
-                stt.setText(text);
-                handleSpeechText(text);
+                for (String text : bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)) {
+                    if(handleSpeechText(text)){
+                        stt.setText(text);
+                        break;
+                    }
+                }
             }
 
             @Override
@@ -175,18 +178,18 @@ public class TestActivity extends AppCompatActivity {
         TOGGLE,
     };
 
-    private void handleSpeechText(String text){
+    private boolean handleSpeechText(String text){
         String tokenOn[] = new String[]{"打開", "開"};
         for(String tk : tokenOn){
             if(text.startsWith(tk)){
                 performControl(Action.TURN_ON, text.substring(tk.length()));
-                return;
+                return true;
             }
         }
         for(String tk : tokenOn){
             if(text.endsWith(tk)){
                 performControl(Action.TURN_ON, text.substring(0, text.length()-tk.length()));
-                return;
+                return true;
             }
         }
 
@@ -194,13 +197,13 @@ public class TestActivity extends AppCompatActivity {
         for(String tk : tokenOff){
             if(text.startsWith(tk)){
                 performControl(Action.TURN_OFF, text.substring(tk.length()));
-                return;
+                return true;
             }
         }
         for(String tk : tokenOff){
             if(text.endsWith(tk)){
                 performControl(Action.TURN_OFF, text.substring(0, text.length()-tk.length()));
-                return;
+                return true;
             }
         }
 
@@ -208,7 +211,7 @@ public class TestActivity extends AppCompatActivity {
         for(String tk : tokenMin){
             if(text.endsWith(tk)){
                 performControl(Action.TURN_MIN, text.substring(0, text.length()-tk.length()));
-                return;
+                return true;
             }
         }
 
@@ -216,10 +219,11 @@ public class TestActivity extends AppCompatActivity {
         for(String tk : tokenMax){
             if(text.endsWith(tk)){
                 performControl(Action.TURN_MAX, text.substring(0, text.length()-tk.length()));
-                return;
+                return true;
             }
         }
 
+        return false;
     }
 
     private void performControl(Action action, String obj){
