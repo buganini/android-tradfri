@@ -25,6 +25,7 @@ import com.uyas.speaker.tradfri.Device;
 import com.uyas.speaker.tradfri.R;
 import com.uyas.speaker.tradfri.Tradfri;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestActivity extends AppCompatActivity {
@@ -127,12 +128,14 @@ public class TestActivity extends AppCompatActivity {
 
             @Override
             public void onResults(Bundle bundle) {
-                for (String text : bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)) {
+                ArrayList<String> results = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                for (String text : results) {
                     if(handleSpeechText(text)){
                         stt.setText(text);
-                        break;
+                        return;
                     }
                 }
+                stt.setText(results.toString());
             }
 
             @Override
