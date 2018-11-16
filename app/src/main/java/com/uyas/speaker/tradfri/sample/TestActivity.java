@@ -170,6 +170,8 @@ public class TestActivity extends AppCompatActivity {
     enum Action {
         TURN_ON,
         TURN_OFF,
+        TURN_MIN,
+        TURN_MAX,
         TOGGLE,
     };
 
@@ -201,10 +203,27 @@ public class TestActivity extends AppCompatActivity {
                 return;
             }
         }
+
+        String tokenMin[] = new String[]{"調到最暗", "最暗"};
+        for(String tk : tokenMin){
+            if(text.endsWith(tk)){
+                performControl(Action.TURN_MIN, text.substring(0, text.length()-tk.length()));
+                return;
+            }
+        }
+
+        String tokenMax[] = new String[]{"調到最亮", "最亮"};
+        for(String tk : tokenMax){
+            if(text.endsWith(tk)){
+                performControl(Action.TURN_MAX, text.substring(0, text.length()-tk.length()));
+                return;
+            }
+        }
+
     }
 
     private void performControl(Action action, String obj){
-        if("全部".equals(obj)){
+        if("全部".equals(obj) || obj.isEmpty()){
             obj = null;
         }
         if(obj == null){
@@ -219,8 +238,18 @@ public class TestActivity extends AppCompatActivity {
                         d.turnOff();
                     }
                     break;
+                case TURN_MIN:
+                    for(Device d : mTradfri.getDevices()){
+                        d.setBrightness(Device.MIN_BRIGHTNESS);
+                    }
+                    break;
+                case TURN_MAX:
+                    for(Device d : mTradfri.getDevices()){
+                        d.setBrightness(Device.MAX_BRIGHTNESS);
+                    }
+                    break;
             }
-
+            return;
         }
         Device d = mTradfri.getDeviceByName(obj);
         if(d != null){
@@ -230,6 +259,12 @@ public class TestActivity extends AppCompatActivity {
                     break;
                 case TURN_OFF:
                     d.turnOff();
+                    break;
+                case TURN_MIN:
+                    d.setBrightness(Device.MIN_BRIGHTNESS);
+                    break;
+                case TURN_MAX:
+                    d.setBrightness(Device.MAX_BRIGHTNESS);
                     break;
             }
         }
