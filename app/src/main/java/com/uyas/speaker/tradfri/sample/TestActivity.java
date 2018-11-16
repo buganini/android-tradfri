@@ -259,6 +259,9 @@ public class TestActivity extends AppCompatActivity {
             TextView path;
             Button toggle;
             SeekBar brightness;
+            SeekBar spectrum;
+            View control_brightness;
+            View control_spectrum;
             Device device;
 
             ViewHolder(View view){
@@ -270,9 +273,13 @@ public class TestActivity extends AppCompatActivity {
                         device.toggle();
                     }
                 });
+
+                control_brightness = view.findViewById(R.id.control_brightness);
+                control_spectrum = view.findViewById(R.id.control_spectrum);
+
                 brightness = view.findViewById(R.id.brightness);
-                brightness.setMin(0);
-                brightness.setMax(255);
+                brightness.setMin(Device.MIN_BRIGHTNESS);
+                brightness.setMax(Device.MAX_BRIGHTNESS);
                 brightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -289,6 +296,26 @@ public class TestActivity extends AppCompatActivity {
                         device.setBrightness(seekBar.getProgress());
                     }
                 });
+
+                spectrum = view.findViewById(R.id.spectrum);
+                spectrum.setMin(Device.MIN_SPECTRUM);
+                spectrum.setMax(Device.MAX_SPECTRUM);
+                spectrum.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        device.setSpectrum(seekBar.getProgress());
+                    }
+                });
             }
 
             void bind(Device d){
@@ -296,15 +323,18 @@ public class TestActivity extends AppCompatActivity {
                 path.setText(d.getName());
                 if(!device.isReady()){
                     toggle.setVisibility(View.GONE);
-                    brightness.setVisibility(View.GONE);
+                    control_brightness.setVisibility(View.GONE);
+                    control_spectrum.setVisibility(View.GONE);
                     return;
                 }
                 if(d.supportLightControl()){
                     toggle.setText(d.getState() ? "Off" : "On");
                 }
                 toggle.setVisibility(d.supportLightControl() ? View.VISIBLE : View.GONE);
-                brightness.setVisibility(d.supportLightControl() ? View.VISIBLE : View.GONE);
+                control_brightness.setVisibility(d.supportLightControl() ? View.VISIBLE : View.GONE);
                 brightness.setProgress(device.getBrightness());
+                control_spectrum.setVisibility(d.supportSpectrum() ? View.VISIBLE : View.GONE);
+                spectrum.setProgress(device.getSpectrum());
             }
         }
 

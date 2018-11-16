@@ -17,6 +17,12 @@ import static com.uyas.speaker.tradfri.Const.*;
 public class Device {
     private final static String TAG = "Device";
 
+    public final static int MIN_BRIGHTNESS = 0;
+    public final static int MAX_BRIGHTNESS = 255;
+
+    public final static int MIN_SPECTRUM = 250;
+    public final static int MAX_SPECTRUM = 454;
+
     private Gateway mGateway;
     private String mPath;
 
@@ -26,6 +32,8 @@ public class Device {
     private int mBrightness;
     private boolean mReady = false;
     private boolean mSupportLightControl = false;
+    private boolean mSupportSpectrum = false;
+    private int mSpectrum;
 
     public Device(Gateway gateway, String path){
         mGateway = gateway;
@@ -56,6 +64,10 @@ public class Device {
         return mSupportLightControl;
     }
 
+    public boolean supportSpectrum(){
+        return mSupportSpectrum;
+    }
+
     public void observe(){
         getClient().observe(new CoapHandler() {
             @Override
@@ -74,6 +86,10 @@ public class Device {
                         JSONObject lc = lca.getJSONObject(0);
                         mState = lc.getInt(ATTR_DEVICE_STATE) != 0;
                         mBrightness = lc.getInt(ATTR_LIGHT_DIMMER);
+                        if(lc.has(ATTR_LIGHT_MIREDS)){
+                            mSupportSpectrum = true;
+                            mSpectrum = lc.getInt(ATTR_LIGHT_MIREDS);
+                        }
                     }
                     mReady = true;
                     mGateway.deviceListUpdated();
@@ -108,6 +124,8 @@ public class Device {
         if(mState == null){
             return;
         }
+        brightness = Math.min(brightness, MAX_BRIGHTNESS);
+        brightness = Math.max(brightness, MIN_BRIGHTNESS);
         JSONObject data = new JSONObject();
         JSONArray lca = new JSONArray();
         JSONObject lc = new JSONObject();
@@ -123,6 +141,43 @@ public class Device {
             @Override
             public void onLoad(CoapResponse response) {
                 Log.e(TAG, "SetBrightness: "+response.getResponseText());
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
+    }
+
+    public int getSpectrum(){
+        return mSpectrum;
+    }
+
+    public void setSpectrum(int spectrum){
+        if(!supportLightControl()){
+            return;
+        }
+        if(mState == null){
+            return;
+        }
+        spectrum = Math.min(spectrum, MAX_SPECTRUM);
+        spectrum = Math.max(spectrum, MIN_SPECTRUM);
+        JSONObject data = new JSONObject();
+        JSONArray lca = new JSONArray();
+        JSONObject lc = new JSONObject();
+        try {
+            lc.put(ATTR_LIGHT_MIREDS, spectrum);
+            lca.put(lc);
+            data.put(ATTR_LIGHT_CONTROL, lca);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+        getClient().put(new CoapHandler() {
+            @Override
+            public void onLoad(CoapResponse response) {
+                Log.e(TAG, "setSpectrum: "+response.getResponseText());
             }
 
             @Override

@@ -24,9 +24,41 @@
 
     </LinearLayout>
 
-    <SeekBar
-        android:id="@+id/brightness"
+
+    <LinearLayout
+        android:id="@+id/control_brightness"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Brightness" />
+
+        <SeekBar
+            android:id="@+id/brightness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/control_spectrum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Spectrum" />
+
+        <SeekBar
+            android:id="@+id/spectrum"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
 </LinearLayout>
