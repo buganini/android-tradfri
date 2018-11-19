@@ -17,20 +17,6 @@ import static com.uyas.speaker.tradfri.Const.*;
 public class Device {
     private final static String TAG = "Device";
 
-    // https://github.com/ggravlingen/pytradfri/issues/132
-
-    public final static int MIN_BRIGHTNESS = 1;
-    public final static int MAX_BRIGHTNESS = 254;
-
-    public final static int MIN_SPECTRUM = 250;
-    public final static int MAX_SPECTRUM = 454;
-
-    public final static int MIN_HUE = 0;
-    public final static int MAX_HUE = 65535;
-
-    public final static int MIN_SATURATION = 0;
-    public final static int MAX_SATURATION = 65279;
-
     private Gateway mGateway;
     private String mPath;
 

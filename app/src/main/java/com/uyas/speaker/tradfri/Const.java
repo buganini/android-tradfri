@@ -128,6 +128,18 @@ public class Const {
 //    RANGE_X = (0, 65535)
 //    RANGE_Y = (0, 65535)
 
+    public final static int MIN_BRIGHTNESS = 1;
+    public final static int MAX_BRIGHTNESS = 254;
+
+    public final static int MIN_SPECTRUM = 250;
+    public final static int MAX_SPECTRUM = 454;
+
+    public final static int MIN_HUE = 0;
+    public final static int MAX_HUE = 65535;
+
+    public final static int MIN_SATURATION = 0;
+    public final static int MAX_SATURATION = 65279;
+
 
     public final static int SUPPORT_BRIGHTNESS = 1;
     public final static int SUPPORT_COLOR_TEMP = 2;

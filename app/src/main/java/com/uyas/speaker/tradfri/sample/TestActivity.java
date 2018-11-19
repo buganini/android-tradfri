@@ -21,6 +21,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.uyas.speaker.tradfri.Const;
 import com.uyas.speaker.tradfri.Device;
 import com.uyas.speaker.tradfri.R;
 import com.uyas.speaker.tradfri.Tradfri;
@@ -247,12 +248,12 @@ public class TestActivity extends AppCompatActivity {
                     break;
                 case TURN_MIN:
                     for(Device d : mTradfri.getDevices()){
-                        d.setBrightness(Device.MIN_BRIGHTNESS);
+                        d.setBrightness(Const.MIN_BRIGHTNESS);
                     }
                     break;
                 case TURN_MAX:
                     for(Device d : mTradfri.getDevices()){
-                        d.setBrightness(Device.MAX_BRIGHTNESS);
+                        d.setBrightness(Const.MAX_BRIGHTNESS);
                     }
                     break;
             }
@@ -268,10 +269,10 @@ public class TestActivity extends AppCompatActivity {
                     d.turnOff();
                     break;
                 case TURN_MIN:
-                    d.setBrightness(Device.MIN_BRIGHTNESS);
+                    d.setBrightness(Const.MIN_BRIGHTNESS);
                     break;
                 case TURN_MAX:
-                    d.setBrightness(Device.MAX_BRIGHTNESS);
+                    d.setBrightness(Const.MAX_BRIGHTNESS);
                     break;
             }
         }
@@ -326,7 +327,7 @@ public class TestActivity extends AppCompatActivity {
 
                 brightness = view.findViewById(R.id.brightness);
                 brightness.setMin(0);
-                brightness.setMax(Device.MAX_BRIGHTNESS - Device.MIN_BRIGHTNESS);
+                brightness.setMax(Const.MAX_BRIGHTNESS - Const.MIN_BRIGHTNESS);
                 brightness.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -340,13 +341,13 @@ public class TestActivity extends AppCompatActivity {
 
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
-                        device.setBrightness(seekBar.getProgress() + Device.MIN_BRIGHTNESS);
+                        device.setBrightness(seekBar.getProgress() + Const.MIN_BRIGHTNESS);
                     }
                 });
 
                 spectrum = view.findViewById(R.id.spectrum);
                 spectrum.setMin(0);
-                spectrum.setMax(Device.MAX_SPECTRUM - Device.MIN_SPECTRUM);
+                spectrum.setMax(Const.MAX_SPECTRUM - Const.MIN_SPECTRUM);
                 spectrum.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -360,13 +361,13 @@ public class TestActivity extends AppCompatActivity {
 
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
-                        device.setSpectrum(seekBar.getProgress() + Device.MIN_SPECTRUM);
+                        device.setSpectrum(seekBar.getProgress() + Const.MIN_SPECTRUM);
                     }
                 });
 
                 hue = view.findViewById(R.id.hue);
                 hue.setMin(0);
-                hue.setMax(Device.MAX_HUE - Device.MIN_HUE);
+                hue.setMax(Const.MAX_HUE - Const.MIN_HUE);
                 hue.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -380,13 +381,13 @@ public class TestActivity extends AppCompatActivity {
 
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
-                        device.setHue(seekBar.getProgress() + Device.MIN_HUE);
+                        device.setHue(seekBar.getProgress() + Const.MIN_HUE);
                     }
                 });
 
                 saturation = view.findViewById(R.id.saturation);
                 saturation.setMin(0);
-                saturation.setMax(Device.MAX_SATURATION - Device.MIN_SATURATION);
+                saturation.setMax(Const.MAX_SATURATION - Const.MIN_SATURATION);
                 saturation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -400,7 +401,7 @@ public class TestActivity extends AppCompatActivity {
 
                     @Override
                     public void onStopTrackingTouch(SeekBar seekBar) {
-                        device.setSaturation(seekBar.getProgress() + Device.MIN_SATURATION);
+                        device.setSaturation(seekBar.getProgress() + Const.MIN_SATURATION);
                     }
                 });
             }
@@ -421,13 +422,13 @@ public class TestActivity extends AppCompatActivity {
                 }
                 toggle.setVisibility(d.supportLightControl() ? View.VISIBLE : View.GONE);
                 control_brightness.setVisibility(d.supportLightControl() ? View.VISIBLE : View.GONE);
-                brightness.setProgress(device.getBrightness() - Device.MIN_BRIGHTNESS);
+                brightness.setProgress(device.getBrightness() - Const.MIN_BRIGHTNESS);
                 control_spectrum.setVisibility(d.supportSpectrum() ? View.VISIBLE : View.GONE);
-                spectrum.setProgress(device.getSpectrum() - Device.MIN_SPECTRUM);
+                spectrum.setProgress(device.getSpectrum() - Const.MIN_SPECTRUM);
                 control_hue.setVisibility(d.supportColor() ? View.VISIBLE : View.GONE);
-                hue.setProgress(device.getHue() - Device.MIN_HUE);
+                hue.setProgress(device.getHue() - Const.MIN_HUE);
                 control_saturation.setVisibility(d.supportColor() ? View.VISIBLE : View.GONE);
-                saturation.setProgress(device.getSaturation() - Device.MIN_SATURATION);
+                saturation.setProgress(device.getSaturation() - Const.MIN_SATURATION);
             }
         }
 
