@@ -159,17 +159,7 @@ public class Device {
             e.printStackTrace();
             return;
         }
-        getClient().put(new CoapHandler() {
-            @Override
-            public void onLoad(CoapResponse response) {
-                Log.e(TAG, "SetBrightness: "+response.getResponseText());
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
+        put(data);
     }
 
     public int getSpectrum(){
@@ -196,17 +186,7 @@ public class Device {
             e.printStackTrace();
             return;
         }
-        getClient().put(new CoapHandler() {
-            @Override
-            public void onLoad(CoapResponse response) {
-                Log.e(TAG, "setSpectrum: "+response.getResponseText());
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
+        put(data);
     }
 
     public int getHue(){
@@ -234,17 +214,7 @@ public class Device {
             e.printStackTrace();
             return;
         }
-        getClient().put(new CoapHandler() {
-            @Override
-            public void onLoad(CoapResponse response) {
-                Log.e(TAG, "setHue: "+response.getResponseText());
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
+        put(data);
     }
 
     public int getSaturation(){
@@ -272,17 +242,7 @@ public class Device {
             e.printStackTrace();
             return;
         }
-        getClient().put(new CoapHandler() {
-            @Override
-            public void onLoad(CoapResponse response) {
-                Log.e(TAG, "setSaturation: "+response.getResponseText());
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
+        put(data);
     }
 
     public void setName(String name){
@@ -296,17 +256,7 @@ public class Device {
             e.printStackTrace();
             return;
         }
-        getClient().put(new CoapHandler() {
-            @Override
-            public void onLoad(CoapResponse response) {
-                Log.e(TAG, "SetName: "+response.getResponseText());
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
+        put(data);
     }
 
     public void toggle(){
@@ -338,17 +288,7 @@ public class Device {
             e.printStackTrace();
             return;
         }
-        getClient().put(new CoapHandler() {
-            @Override
-            public void onLoad(CoapResponse response) {
-                Log.e(TAG, "TurnOn: "+response.getResponseText());
-            }
-
-            @Override
-            public void onError() {
-
-            }
-        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
+        put(data);
     }
 
     public void turnOff(){
@@ -369,16 +309,20 @@ public class Device {
             e.printStackTrace();
             return;
         }
+        put(data);
+    }
+
+    private void put(JSONObject payload){
         getClient().put(new CoapHandler() {
             @Override
             public void onLoad(CoapResponse response) {
-                Log.e(TAG, "TurnOff: "+response.getResponseText());
+
             }
 
             @Override
             public void onError() {
 
             }
-        }, data.toString(), MediaTypeRegistry.APPLICATION_JSON);
+        }, payload.toString(), MediaTypeRegistry.APPLICATION_JSON);
     }
 }
