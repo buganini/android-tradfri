@@ -109,6 +109,12 @@ public class Tradfri {
             if(!mGateways.contains(gateway)){
                 gateway.init();
                 mGateways.add(gateway);
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mListener.onRefresh();
+                    }
+                });
             }
         }
     };
